@@ -1,11 +1,14 @@
 from pynput.mouse import Button, Controller
 from numpy import *
-from PIL import ImageGrab, ImageOps
+from PIL import ImageGrab, ImageOps, Image
 import os
 import time
 import random
+import mss
+import mss.tools
 
 """
+https://www.silvergames.com/en/piano-tiles
 All coordinates assume a screen resolution of 1440x900, and Chrome 
 sized to 720x730 to the right with the Bookmarks Toolbar disabled.
 The down key is pressed twice.
@@ -56,6 +59,19 @@ def box_PIL(a, b, c, d):
     return (2 * a, 2 * b, 2 * c, 2 * d)
 
 def screenshot(save = False):
+    with mss.mss() as sct:
+        # The screen part to capture
+        screen = {"top": Offset.y + 1, "left": Offset.x + 1, "width": 421, "height": 700}
+        im = sct.grab(screen)
+
+        # Save image
+        if save:
+            path = os.getcwd() + '/snaps/snap__' + str(int(time.time())) + '.png'
+            mss.tools.to_png(im.rgb, im.size, output=path)
+        # Convert to PIL/Pillow Image
+        return Image.frombytes('RGB', im.size, im.bgra, 'raw', 'BGRX')
+
+def screenshot_slow(save = False):
     box = box_PIL(Offset.x + 1, Offset.y + 1, Offset.x + 421, Offset.y + 700)
     im = ImageGrab.grab(box)
     if save:
@@ -118,9 +134,7 @@ def check_tiles():
         tile = tiles[i]
         if (tile[0] < tile_red_val_thresh):
             move(lag(tile_coords[i]))
-            print(lag(tile_coords[i]))
             leftClick(1)
-            print(i)
 
 
 def start_game():
@@ -131,10 +145,10 @@ def main():
     # start_game()
 
     i = 0
-    while i < 5:
+    while i < 500:
         i += 1
         tiles = check_tiles()
-        time.sleep(0.08)
+        time.sleep(0.1)
 
 if __name__ == '__main__':
     main()
