@@ -114,7 +114,7 @@ def getCoords():
     return (x,y)
 
 def lag(coord):
-    return (coord[0], coord[1] + 120)
+    return (coord[0], coord[1] + 70)
 # -----------------------------------------------
 # Main
 # -----------------------------------------------
@@ -127,6 +127,7 @@ def check_tiles_slow():
     return (value(box_1), value(box_2), value(box_3), value(box_4))
 
 def check_tiles():
+    move_made = False
     im = screenshot()
     tiles = [im.getpixel(coord_PIL(tile_coords[i])) for i in range(4)]
 
@@ -135,6 +136,9 @@ def check_tiles():
         if (tile[0] < tile_red_val_thresh):
             move(lag(tile_coords[i]))
             leftClick(1)
+            move_made = True
+
+    return move_made
 
 
 def start_game():
@@ -142,13 +146,14 @@ def start_game():
     leftClick(2)
 
 def main():
-    # start_game()
-
-    i = 0
-    while i < 500:
-        i += 1
-        tiles = check_tiles()
+    moves_unmade = 0
+    while moves_unmade < 10:
+        move_made = check_tiles()
         time.sleep(0.1)
+        if not move_made:
+            moves_unmade += 1
+        else:
+            moves_unmade = 0
 
 if __name__ == '__main__':
     main()
