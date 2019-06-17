@@ -8,7 +8,8 @@ import mss
 import mss.tools
 
 """
-https://www.silvergames.com/en/piano-tiles
+Piano Tiles bot for https://www.silvergames.com/en/piano-tiles
+
 All coordinates assume a screen resolution of 1440x900, and Chrome 
 sized to 720x730 to the right with the Bookmarks Toolbar disabled.
 The down key is pressed twice.
@@ -20,32 +21,22 @@ class Offset:
     x = 854
     y = 100
 
-    # coordinates of the start button
-    start_x = 156
-    start_y = 438
-
-    tile_y = 423
-
-class Box:
-    one = 856
-    two = 961
-    three = 1066
-    four = 1171
-
 class Tile:
-    pass
+    width = 102
+    height = 25
+    black_tile_thresh = 100
+    coords = [(46, 380), (162, 380), (261, 380), (374, 380)]
+    count = 4
+
 # -----------------------------------------------
 # Globals
 # -----------------------------------------------
 mouse = Controller()
 
-tile_width = 102
-tile_height = 25
+screen_width = 421
+screen_height = 700
 
-black_tile_threshold = 10750
-tile_red_val_thresh = 100
-
-tile_coords = [(46, 380), (162, 380), (261, 380), (374, 380)]
+lag_y = 70
 
 # -----------------------------------------------
 # Helper Functions
@@ -59,10 +50,10 @@ def box_PIL(a, b, c, d):
     return (2 * a, 2 * b, 2 * c, 2 * d)
 
 def screenshot(save = False):
-    with mss.mss() as sct:
+    with mss.mss() as screen:
         # The screen part to capture
-        screen = {"top": Offset.y + 1, "left": Offset.x + 1, "width": 421, "height": 700}
-        im = sct.grab(screen)
+        play_area = {"top": Offset.y + 1, "left": Offset.x + 1, "width": screen_width, "height": screen_height}
+        im = screen.grab(play_area)
 
         # Save image
         if save:
@@ -114,42 +105,29 @@ def getCoords():
     return (x,y)
 
 def lag(coord):
-    return (coord[0], coord[1] + 70)
+    return (coord[0], coord[1] + lag_y)
+
 # -----------------------------------------------
 # Main
 # -----------------------------------------------
-def check_tiles_slow():
-    box_1 = box_PIL(Box.one, Offset.tile_y, Box.one + tile_width, Offset.tile_y + tile_height)
-    box_2 = box_PIL(Box.two, Offset.tile_y, Box.two + tile_width, Offset.tile_y + tile_height)
-    box_3 = box_PIL(Box.three, Offset.tile_y, Box.three + tile_width, Offset.tile_y + tile_height)
-    box_4 = box_PIL(Box.four, Offset.tile_y, Box.four + tile_width, Offset.tile_y + tile_height)
-    
-    return (value(box_1), value(box_2), value(box_3), value(box_4))
-
 def check_tiles():
     move_made = False
     im = screenshot()
-    tiles = [im.getpixel(coord_PIL(tile_coords[i])) for i in range(4)]
+    tiles_rgb = [im.getpixel(coord_PIL(Tile.coords[i])) for i in range(Tile.count)]
 
-    for i in range(4):
-        tile = tiles[i]
-        if (tile[0] < tile_red_val_thresh):
-            move(lag(tile_coords[i]))
+    for i in range(Tile.count):
+        tile_rgb = tiles_rgb[i]
+        if (tile_rgb[0] < Tile.black_tile_thresh):
+            move(lag(Tile.coords[i]))
             leftClick(1)
             move_made = True
 
     return move_made
 
-
-def start_game():
-    move((Offset.start_x, Offset.start_y))
-    leftClick(2)
-
 def main():
     moves_unmade = 0
     while moves_unmade < 10:
         move_made = check_tiles()
-        time.sleep(0.1)
         if not move_made:
             moves_unmade += 1
         else:
