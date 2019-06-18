@@ -65,26 +65,6 @@ def screenshot(save = False):
         # Convert to PIL/Pillow Image
         return Image.frombytes('RGB', im.size, im.bgra, 'raw', 'BGRX')
 
-def screenshot_slow(save = False):
-    box = box_PIL(Offset.x + 1, Offset.y + 1, Offset.x + 421, Offset.y + 700)
-    im = ImageGrab.grab(box)
-    if save:
-        path = os.getcwd() + '/snaps/snap__' + str(int(time.time())) + '.png'
-        im.save(path, 'PNG')
-    return im
-
-def value(box, save = False):
-    im = ImageGrab.grab(box)
-    if save:
-        path = os.getcwd() + '/snaps/snap__' + str(int(time.time())) + '.png'
-        im.save(path, 'PNG')
-    im_gray = ImageOps.grayscale(im)
-    a = array(im_gray.getcolors())
-    a = a.sum()
-    if save:
-        im_gray.save(os.getcwd() + '/snaps/grayscale__' + str(int(time.time())) + '.png', 'PNG')    
-    return a
-
 # -----------------------------------------------
 # Mouse Controls
 # -----------------------------------------------
@@ -138,3 +118,26 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# -----------------------------------------------
+# Deprecated functions
+# -----------------------------------------------
+def screenshot_slow(save = False):
+    box = box_PIL(Offset.x + 1, Offset.y + 1, Offset.x + 421, Offset.y + 700)
+    im = ImageGrab.grab(box)
+    if save:
+        path = os.getcwd() + '/snaps/snap__' + str(int(time.time())) + '.png'
+        im.save(path, 'PNG')
+    return im
+
+def value(box, save = False):
+    im = ImageGrab.grab(box)
+    if save:
+        path = os.getcwd() + '/snaps/snap__' + str(int(time.time())) + '.png'
+        im.save(path, 'PNG')
+    im_gray = ImageOps.grayscale(im)
+    a = array(im_gray.getcolors())
+    a = a.sum()
+    if save:
+        im_gray.save(os.getcwd() + '/snaps/grayscale__' + str(int(time.time())) + '.png', 'PNG')    
+    return a
