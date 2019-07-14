@@ -14,8 +14,10 @@ All coordinates assume a screen resolution of 1440x900, and Chrome
 sized to 720x730 to the right with the Bookmarks Toolbar disabled.
 The down key is pressed twice.
 
-To terminate the game, place a white screen behind it and move it to
-the left of the screen.
+Note: Place a white background behind the game window before you begin. 
+To terminate the game, move the window to the left of the screen. 
+Using Magnet, Ctrl + Option + Left moves a window to the left of the 
+screen.
 
 Play area  = Offset.x + 1, Offset.y + 1, 1275, 800
 """
